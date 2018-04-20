@@ -102,8 +102,7 @@ func NewKubeConfigLoaderFromYAMLFile(filename string, skipConfigPersist bool) (*
 
 	// Init an empty api.Config as unmarshal layout template
 	c := api.Config{}
-	err = yaml.Unmarshal(kubeConfig, &c)
-	if err != nil {
+	if err := yaml.Unmarshal(kubeConfig, &c); err != nil {
 		return nil, err
 	}
 
@@ -114,8 +113,7 @@ func NewKubeConfigLoaderFromYAMLFile(filename string, skipConfigPersist bool) (*
 	}
 
 	// Init loader with current cluster, user and context
-	err = l.LoadActiveContext()
-	if err != nil {
+	if err := l.LoadActiveContext(); err != nil {
 		return nil, err
 	}
 	return &l, nil
@@ -126,8 +124,7 @@ func NewKubeConfigLoaderFromYAMLFile(filename string, skipConfigPersist bool) (*
 func (l *KubeConfigLoader) LoadAndSet() (*client.Configuration, error) {
 	l.loadAuthentication()
 
-	err := l.loadClusterInfo()
-	if err != nil {
+	if err := l.loadClusterInfo(); err != nil {
 		return nil, err
 	}
 	return l.setConfig()
@@ -230,8 +227,7 @@ func (l *KubeConfigLoader) SetActiveContext(ctx string) error {
 
 	// Persist kube config file
 	if !l.skipConfigPersist {
-		err = l.persistConfig()
-		if err != nil {
+		if err := l.persistConfig(); err != nil {
 			return err
 		}
 	}

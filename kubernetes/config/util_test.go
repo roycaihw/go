@@ -47,8 +47,7 @@ func TestSetUserWithName(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		err := setUserWithName(tc.Origin, tc.Name, tc.User)
-		if err != nil {
+		if err := setUserWithName(tc.Origin, tc.Name, tc.User); err != nil {
 			t.Errorf("unexpected error setting user with name: %v", err)
 		}
 

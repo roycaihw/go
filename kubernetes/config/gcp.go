@@ -37,15 +37,13 @@ func (l *KubeConfigLoader) loadGCPToken() bool {
 
 	// Refresh GCP token if necessary
 	if l.user.AuthProvider.Config == nil {
-		err := l.refreshGCPToken()
-		if err != nil {
+		if err := l.refreshGCPToken(); err != nil {
 			glog.Errorf("failed to refresh GCP token: %v", err)
 			return false
 		}
 	}
 	if _, ok := l.user.AuthProvider.Config["expiry"]; !ok {
-		err := l.refreshGCPToken()
-		if err != nil {
+		if err := l.refreshGCPToken(); err != nil {
 			glog.Errorf("failed to refresh GCP token: %v", err)
 			return false
 		}
@@ -57,8 +55,7 @@ func (l *KubeConfigLoader) loadGCPToken() bool {
 	}
 
 	if expired {
-		err := l.refreshGCPToken()
-		if err != nil {
+		if err := l.refreshGCPToken(); err != nil {
 			glog.Errorf("failed to refresh GCP token: %v", err)
 			return false
 		}
@@ -90,8 +87,7 @@ func (l *KubeConfigLoader) refreshGCPToken() error {
 	setUserWithName(l.rawConfig.AuthInfos, l.currentContext.AuthInfo, &l.user)
 	// Persist kube config file
 	if !l.skipConfigPersist {
-		err = l.persistConfig()
-		if err != nil {
+		if err := l.persistConfig(); err != nil {
 			return err
 		}
 	}

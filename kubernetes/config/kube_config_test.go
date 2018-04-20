@@ -320,8 +320,7 @@ func TestLoadKubeConfig(t *testing.T) {
 			skipConfigPersist: true,
 			gcLoader:          tc.GCLoader,
 		}
-		err = actual.SetActiveContext(tc.ActiveContext)
-		if err != nil {
+		if err := actual.SetActiveContext(tc.ActiveContext); err != nil {
 			t.Errorf("context %v, unexpected error setting config active context: %v", tc.ActiveContext, err)
 		}
 
@@ -329,8 +328,7 @@ func TestLoadKubeConfig(t *testing.T) {
 		// the generate client's Configuration based on the restConfig, because we are using fake
 		// data as TLS cert, which would fail PEM validation
 		actual.loadAuthentication()
-		err = actual.loadClusterInfo()
-		if err != nil {
+		if err := actual.loadClusterInfo(); err != nil {
 			t.Errorf("context %v, unexpected error loading kube config: %v", tc.ActiveContext, err)
 		}
 		if !reflect.DeepEqual(expected, actual.RestConfig()) {
@@ -344,8 +342,7 @@ func TestLoadKubeConfigSSLNoFile(t *testing.T) {
 		rawConfig:         testKubeConfig,
 		skipConfigPersist: true,
 	}
-	err := actual.SetActiveContext("ssl_no_file")
-	if err != nil {
+	if err := actual.SetActiveContext("ssl_no_file"); err != nil {
 		t.Errorf("context %v, unexpected error setting config active context: %v", "ssl_no_file", err)
 	}
 
@@ -353,8 +350,7 @@ func TestLoadKubeConfigSSLNoFile(t *testing.T) {
 	// the generate client's Configuration based on the restConfig, because we are using fake
 	// data as TLS cert, which would fail PEM validation
 	actual.loadAuthentication()
-	err = actual.loadClusterInfo()
-	if err == nil || !strings.Contains(err.Error(), "failed to get data or file") {
+	if err := actual.loadClusterInfo(); err == nil || !strings.Contains(err.Error(), "failed to get data or file") {
 		t.Errorf("context %v, expecting failure to get file, got: %v", "ssl_no_file", err)
 	}
 }
@@ -385,20 +381,16 @@ func TestLoadKubeConfigSSLLocalFile(t *testing.T) {
 		t.Errorf("context %v, unexpected error setting up fake config: %v", tc.ActiveContext, err)
 	}
 
-	err = ioutil.WriteFile("/tmp/client-ssl-test-cert-file", testCertAuthBase64, 0644)
-	if err != nil {
+	if err := ioutil.WriteFile("/tmp/client-ssl-test-cert-file", testCertAuthBase64, 0644); err != nil {
 		t.Errorf("context %v, unexpected error writing temp file %v: %v", tc.ActiveContext, "/tmp/client-ssl-test-cert-file", err)
 	}
-	err = ioutil.WriteFile("/tmp/client-ssl-test-token-local-file", []byte(testDataBase64), 0644)
-	if err != nil {
+	if err := ioutil.WriteFile("/tmp/client-ssl-test-token-local-file", []byte(testDataBase64), 0644); err != nil {
 		t.Errorf("context %v, unexpected error writing temp file %v: %v", tc.ActiveContext, "/tmp/client-ssl-test-token-local-file", err)
 	}
-	err = ioutil.WriteFile("/tmp/client-ssl-test-client-cert-local-file", testClientCertBase64, 0644)
-	if err != nil {
+	if err := ioutil.WriteFile("/tmp/client-ssl-test-client-cert-local-file", testClientCertBase64, 0644); err != nil {
 		t.Errorf("context %v, unexpected error writing temp file %v: %v", tc.ActiveContext, "/tmp/client-ssl-test-client-cert-local-file", err)
 	}
-	err = ioutil.WriteFile("/tmp/client-ssl-test-client-key-local-file", testClientKeyBase64, 0644)
-	if err != nil {
+	if err := ioutil.WriteFile("/tmp/client-ssl-test-client-key-local-file", testClientKeyBase64, 0644); err != nil {
 		t.Errorf("context %v, unexpected error writing temp file %v: %v", tc.ActiveContext, "/tmp/client-ssl-test-client-key-local-file", err)
 	}
 
@@ -406,8 +398,7 @@ func TestLoadKubeConfigSSLLocalFile(t *testing.T) {
 		rawConfig:         testKubeConfig,
 		skipConfigPersist: true,
 	}
-	err = actual.SetActiveContext(tc.ActiveContext)
-	if err != nil {
+	if err := actual.SetActiveContext(tc.ActiveContext); err != nil {
 		t.Errorf("context %v, unexpected error setting config active context: %v", tc.ActiveContext, err)
 	}
 
@@ -415,8 +406,7 @@ func TestLoadKubeConfigSSLLocalFile(t *testing.T) {
 	// the generate client's Configuration based on the restConfig, because we are using fake
 	// data as TLS cert, which would fail PEM validation
 	actual.loadAuthentication()
-	err = actual.loadClusterInfo()
-	if err != nil {
+	if err := actual.loadClusterInfo(); err != nil {
 		t.Errorf("context %v, unexpected error loading kube config: %v", tc.ActiveContext, err)
 	}
 	if !reflect.DeepEqual(expected, actual.RestConfig()) {
