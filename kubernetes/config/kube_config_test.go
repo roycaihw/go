@@ -64,7 +64,7 @@ var (
 	testClientCertBase64 = stringToBase64(testClientCert)
 
 	// test time set to time.Now() + 2 * expirySkewPreventionDelay, which doesn't expire
-	testTokenNoExpiry = time.Now().Add(2 * expirySkewPreventionDelay).UTC().Format("2006-01-02 15:04:05")
+	testTokenNoExpiry = time.Now().Add(2 * expirySkewPreventionDelay).UTC().Format(gcpRFC3339Format)
 )
 
 var testKubeConfig = api.Config{

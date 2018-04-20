@@ -25,6 +25,10 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
+const (
+	gcpRFC3339Format = "2006-01-02 15:04:05"
+)
+
 // GoogleCredentialLoader defines the interface for getting GCP token
 type GoogleCredentialLoader interface {
 	GetGoogleCredentials() (*oauth2.Token, error)
@@ -82,7 +86,7 @@ func (l *KubeConfigLoader) refreshGCPToken() error {
 
 	// Store credentials to Config
 	l.user.AuthProvider.Config["access-token"] = credentials.AccessToken
-	l.user.AuthProvider.Config["expiry"] = credentials.Expiry.Format("2006-01-02 15:04:05")
+	l.user.AuthProvider.Config["expiry"] = credentials.Expiry.Format(gcpRFC3339Format)
 
 	setUserWithName(l.rawConfig.AuthInfos, l.currentContext.AuthInfo, &l.user)
 	// Persist kube config file

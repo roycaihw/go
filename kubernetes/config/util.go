@@ -40,7 +40,7 @@ func DataOrFile(data []byte, file string) ([]byte, error) {
 
 // isExpired returns true if the token expired in expirySkewPreventionDelay time (default is 5 minutes)
 func isExpired(timestamp string) (bool, error) {
-	ts, err := time.Parse("2006-01-02 15:04:05", timestamp)
+	ts, err := time.Parse(gcpRFC3339Format, timestamp)
 	if err != nil {
 		return false, err
 	}
@@ -61,6 +61,9 @@ func getContextWithName(contexts []api.NamedContext, name string) (*api.Context,
 			context = c.Context.DeepCopy()
 		}
 	}
+	if context == nil {
+		return nil, fmt.Errorf("error parsing kube config: couldn't find context with name %v", name)
+	}
 	return context, nil
 }
 
@@ -73,6 +76,9 @@ func getClusterWithName(clusters []api.NamedCluster, name string) (*api.Cluster,
 			}
 			cluster = c.Cluster.DeepCopy()
 		}
+	}
+	if cluster == nil {
+		return nil, fmt.Errorf("error parsing kube config: couldn't find cluster with name %v", name)
 	}
 	return cluster, nil
 }
@@ -87,6 +93,7 @@ func getUserWithName(users []api.NamedAuthInfo, name string) (*api.AuthInfo, err
 			user = u.AuthInfo.DeepCopy()
 		}
 	}
+	// A context may have no user, or using non-existing user name. We simply return nil *api.AuthInfo in this case.
 	return user, nil
 }
 
