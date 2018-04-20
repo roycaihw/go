@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/url"
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -132,13 +133,6 @@ var testKubeConfig = api.Config{
 				AuthInfo: "ssl_no_file",
 			},
 		},
-		{
-			Name: "ssl_local_file",
-			Context: api.Context{
-				Cluster:  "ssl_local_file",
-				AuthInfo: "ssl_local_file",
-			},
-		},
 	},
 	Clusters: []api.NamedCluster{
 		{
@@ -166,13 +160,6 @@ var testKubeConfig = api.Config{
 			Cluster: api.Cluster{
 				Server:               testSSLServer,
 				CertificateAuthority: "test-cert-no-file",
-			},
-		},
-		{
-			Name: "ssl_local_file",
-			Cluster: api.Cluster{
-				Server:               testSSLServer,
-				CertificateAuthority: "/tmp/client-ssl-test-cert-file",
 			},
 		},
 	},
@@ -236,14 +223,6 @@ var testKubeConfig = api.Config{
 				Token:             testDataBase64,
 				ClientCertificate: "test-client-cert-no-file",
 				ClientKey:         "test-client-key-no-file",
-			},
-		},
-		{
-			Name: "ssl_local_file",
-			AuthInfo: api.AuthInfo{
-				TokenFile:         "/tmp/client-ssl-test-token-local-file",
-				ClientCertificate: "/tmp/client-ssl-test-client-cert-local-file",
-				ClientKey:         "/tmp/client-ssl-test-client-key-local-file",
 			},
 		},
 	},
@@ -381,17 +360,44 @@ func TestLoadKubeConfigSSLLocalFile(t *testing.T) {
 		t.Errorf("context %v, unexpected error setting up fake config: %v", tc.ActiveContext, err)
 	}
 
-	if err := ioutil.WriteFile("/tmp/client-ssl-test-cert-file", testCertAuthBase64, 0644); err != nil {
-		t.Errorf("context %v, unexpected error writing temp file %v: %v", tc.ActiveContext, "/tmp/client-ssl-test-cert-file", err)
+	// Set up CA cert file
+	testCACertFile, err := ioutil.TempFile(os.TempDir(), "ca-cert")
+	if err != nil {
+		t.Errorf("error: failed to create temp ca-cert file")
 	}
-	if err := ioutil.WriteFile("/tmp/client-ssl-test-token-local-file", []byte(testDataBase64), 0644); err != nil {
-		t.Errorf("context %v, unexpected error writing temp file %v: %v", tc.ActiveContext, "/tmp/client-ssl-test-token-local-file", err)
+	defer os.Remove(testCACertFile.Name())
+	if err := ioutil.WriteFile(testCACertFile.Name(), testCertAuthBase64, 0644); err != nil {
+		t.Errorf("context %v, unexpected error writing temp file %v: %v", tc.ActiveContext, testCACertFile.Name(), err)
 	}
-	if err := ioutil.WriteFile("/tmp/client-ssl-test-client-cert-local-file", testClientCertBase64, 0644); err != nil {
-		t.Errorf("context %v, unexpected error writing temp file %v: %v", tc.ActiveContext, "/tmp/client-ssl-test-client-cert-local-file", err)
+
+	// Set up token file
+	testTokenFile, err := ioutil.TempFile(os.TempDir(), "token")
+	if err != nil {
+		t.Errorf("error: failed to create temp token file")
 	}
-	if err := ioutil.WriteFile("/tmp/client-ssl-test-client-key-local-file", testClientKeyBase64, 0644); err != nil {
-		t.Errorf("context %v, unexpected error writing temp file %v: %v", tc.ActiveContext, "/tmp/client-ssl-test-client-key-local-file", err)
+	defer os.Remove(testTokenFile.Name())
+	if err := ioutil.WriteFile(testTokenFile.Name(), []byte(testDataBase64), 0644); err != nil {
+		t.Errorf("context %v, unexpected error writing temp file %v: %v", tc.ActiveContext, testTokenFile.Name(), err)
+	}
+
+	// Set up client cert file
+	testClientCertFile, err := ioutil.TempFile(os.TempDir(), "client-cert")
+	if err != nil {
+		t.Errorf("error: failed to create temp client-cert file")
+	}
+	defer os.Remove(testClientCertFile.Name())
+	if err := ioutil.WriteFile(testClientCertFile.Name(), testClientCertBase64, 0644); err != nil {
+		t.Errorf("context %v, unexpected error writing temp file %v: %v", tc.ActiveContext, testClientCertFile.Name(), err)
+	}
+
+	// Set up client key file
+	testClientKeyFile, err := ioutil.TempFile(os.TempDir(), "client-key")
+	if err != nil {
+		t.Errorf("error: failed to create temp client-key file")
+	}
+	defer os.Remove(testClientKeyFile.Name())
+	if err := ioutil.WriteFile(testClientKeyFile.Name(), testClientKeyBase64, 0644); err != nil {
+		t.Errorf("context %v, unexpected error writing temp file %v: %v", tc.ActiveContext, testClientKeyFile.Name(), err)
 	}
 
 	actual := KubeConfigLoader{
