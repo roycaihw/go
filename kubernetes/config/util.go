@@ -96,14 +96,14 @@ func setUserWithName(users []api.NamedAuthInfo, name string, user *api.AuthInfo)
 
 	for i, u := range users {
 		if u.Name == name {
-			if userFound == true {
+			if userFound {
 				return fmt.Errorf("error setting kube config: duplicate users with name %v", name)
 			}
 			userTarget = &users[i].AuthInfo
 			userFound = true
 		}
 	}
-	if userFound == false {
+	if !userFound {
 		return fmt.Errorf("error setting kube config: cannot find user with name: %v", name)
 	}
 	user.DeepCopyInto(userTarget)

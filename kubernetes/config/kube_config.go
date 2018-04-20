@@ -57,7 +57,7 @@ type KubeConfigLoader struct {
 	gcLoader GoogleCredentialLoader
 }
 
-// RestConfig contains the information that a rest client needed to talk with a server
+// RestConfig contains the information that a rest client needs to talk with a server
 type RestConfig struct {
 	basePath string
 	host     string

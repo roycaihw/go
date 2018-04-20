@@ -68,7 +68,7 @@ func InClusterConfig() (*client.Configuration, error) {
 		Host:          net.JoinHostPort(host, port),
 		Scheme:        "https",
 		DefaultHeader: map[string]string{"Authentication": "Bearer " + string(token)},
-		UserAgent:     "Swagger-Codegen/0.1.0a1/go",
+		UserAgent:     defaultUserAgent,
 		HTTPClient:    c,
 	}, nil
 }
